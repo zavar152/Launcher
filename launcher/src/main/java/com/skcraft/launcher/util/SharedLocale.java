@@ -9,9 +9,11 @@ package com.skcraft.launcher.util;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
+import java.io.*;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
@@ -52,11 +54,24 @@ public class SharedLocale {
      */
     public static String tr(String key) {
         if (bundle != null) {
-            try {
-                return bundle.getString(key);
-            } catch (MissingResourceException e) {
-                log.log(Level.WARNING, "Failed to find message", e);
+            String data = null;
+            InputStream is = SharedLocale.class.getResourceAsStream("/com/skcraft/launcher/lang/Launcher.properties");
+            Reader reader;
+            try
+            {
+                reader = new InputStreamReader(is, "ISO-8859-5");
+                Properties pr = new Properties();
+                pr.load(reader);
+                data = pr.getProperty(key);
+                reader.close();
+                pr.clear();
+                is.close();
             }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            return data;
         }
 
         return "${" + key + "}";
